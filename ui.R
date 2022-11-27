@@ -1,61 +1,84 @@
 library(shiny)
 library(shinydashboard)
+library(shinyWidgets)
+
+# Para alternar entre tabela e gráfico: radioGroupButtons
+# com tabela e gráfico em tabBox
 
 
-# PREENCHER O SIDEBAR COM MENUS, SELETORES E BOTÕES
 
 # header ----
-header <- dashboardHeader(title = "Emprego Formal na Mineração", titleWidth = 450)
+
+header <-
+  dashboardHeader(title = "Emprego Formal na Mineração", 
+                  titleWidth = 350)
 
 # sidebar ----
+
 sidebar <- dashboardSidebar(
   sidebarMenu(
-    menuItem("Estoques",
-             tabName = "tab_estoques"),
-    menuItem("Variações",
-             tabName = "tab_variacoes"),
-    menuItem("Salários",
-             tabName = "tab_salarios")))
+    menuItem("Setor Mineral",
+             tabName = "Tab_SetorMineral"
+             # ,menuSubItem("Estoques", tabName = 'tab_nome1'),
+             # menuSubItem("Saldos", tabName = 'tab_nome2')
+             ),
+    menuItem("Extrativa Mineral",
+             tabName = "tab_Extrativa"),
+    menuItem("Transformação Mineral",
+             tabName = "tab_Transformacao")))
 
 # body ----
+
 body <-
   dashboardBody(tabItems(
-    tabItem(tabName = "tab_estoques",
+    tabItem(
+      tabName = "Tab_SetorMineral"
+      ,h3("Extrativa e Transformação Mineral")
+      
+      ,fluidRow(
+        column(width = 3, offset = 1,
+        radioGroupButtons(
+          inputId = "id_radioGroupButtons_Setor"
+          ,choices = c("A", "B")
+          ,checkIcon = list(
+            yes = icon("square-check", "table-list"),
+            no = icon("square", "table-list"))
+        )))
+      ,fluidRow(
+        tabBox(
+          id = "tabBox_Setor",
+          height = "250px",
+          tabPanel("Tab1", "First tab content"),
+          tabPanel("Tab2", "Tab content 2")
+        )
+      )
+    ),
+    
+    tabItem(tabName = "tab_Extrativa"
+            ,h2("Extrativa Mineral")
             
-            fluidRow(
+            ,fluidRow(
               tabBox(
-                title = "Extração Mineral",
-                # The id lets us use input$tabset1 on the server to find the current tab
-                id = "tabset1",
+                id = "tabBox_Extrativa",
                 height = "250px",
                 tabPanel("Tab1", "First tab content"),
-                tabPanel("Tab2", "Tab content 2")
-              ),
-              tabBox(
-                height = "250px",
-                selected = "Tab3",
-                tabPanel("Tab1", "Tab content 1"),
-                tabPanel("Tab2", "Tab content 2"),
-                tabPanel("Tab3", "Note that when side=right, the tab order is reversed.")
-              )
-            ),
-            fluidRow(
-              tabBox(
-                title = tagList(shiny::icon("gear"), "tabBox status"),
-                tabPanel(
-                  "Tab1",
-                  "Currently selected tab from first box:",
-                  verbatimTextOutput("tabset1Selected")
-                ),
                 tabPanel("Tab2", "Tab content 2")
               )
             )),
     
-    tabItem(tabName = "tab_variacoes",
-            h2("variações interanuais")),
-    tabItem(tabName = "tab_salarios",
-            h2("Salários de admissão e desligamento"))
-  ))
+    tabItem(tabName = "tab_Transformacao"
+            ,h2("Transformação Mineral")
+    ,fluidRow(
+      tabBox(
+        id = "tabBox_Transformacao",
+        height = "250px",
+        tabPanel("Tab1", "First tab content"),
+        tabPanel("Tab2", "Tab content 2")
+      )
+      )
+    )
+    )
+  )
 
 
 
@@ -67,3 +90,15 @@ body <-
 
 shinyUI(dashboardPage(header, sidebar, body,
                       skin = 'yellow'))
+
+
+
+
+
+
+
+
+
+
+
+

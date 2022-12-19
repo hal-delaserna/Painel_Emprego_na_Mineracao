@@ -5,8 +5,6 @@ library(lubridate)
 df_wide <-
   readRDS("./data/Estoque_Novo_Caged_Consolidacao_Saldo_TRIMESTRE_20221030.RDS")
 
-# Selectize para procurar municípios
-
 
 df_long_cnae <-
   tidyr::pivot_longer(
@@ -18,6 +16,17 @@ df_long_cnae <-
     )
   )
 
+
+colnames(df_long_cnae) <- # posteriormente gerar o Rds sem acentuação
+  iconv(colnames(df_long_cnae), from = "UTF-8", to = "ASCII//TRANSLIT")
+
+
+
+# Começar com somente Extrativa
+df_long_cnae <-
+  filter(df_long_cnae, secao == "Indústrias Extrativas")
+
+
 df_long_cnae$trimestre <- 
   as.factor(df_long_cnae$trimestre)
 
@@ -28,23 +37,63 @@ df_long_cnae <-
                    "subclasse",
                    "classe",
                    "grupo",
-                   "divisão",
-                   "seção",
-                   "Município",
+                   "divisao",
+                   "secao",
+                   "Municipio",
                    "UF_sigla",
                    "trimestre",
                    "estoque")]
 
+# df_long_Subclasse ----
 df_long_cnae <- 
   df_long_cnae[df_long_cnae$estoque > 0, ]
 
 
-df_long_cnae_BR <-
-  summarise(
-    group_by(
-      df_long_cnae, 
-      trimestre),
-    "estoque" = sum(estoque))
+
+# df_long_cnae_Classe ----
+df_long_cnae_Classe <- 
+  summarise(group_by(df_long_cnae,
+                      # subclasse_Cod
+                      # ,subclasse
+                         classe
+                        ,grupo
+                        ,divisao
+                     # ,secao
+                      # ,Municipio
+                        ,UF_sigla
+                        ,trimestre
+                     ), "estoque" = sum(estoque, na.rm = T))
+
+# df_long_cnae_Grupo ----
+
+df_long_cnae_Grupo <- 
+  summarise(group_by(df_long_cnae,
+                     # subclasse_Cod
+                     # ,subclasse
+                     # ,classe
+                        grupo
+                       ,divisao
+                     # ,secao
+                     # ,Municipio
+                       ,UF_sigla
+                       ,trimestre
+  ), "estoque" = sum(estoque, na.rm = T))
+
+
+
+# df_long_cnae_Divisao ----
+df_long_cnae_Divisao <- 
+  summarise(group_by(df_long_cnae,
+                     # subclasse_Cod
+                     # ,subclasse
+                     # ,classe
+                     # ,grupo
+                        divisao
+                     # ,secao
+                     # ,Municipio
+                       ,UF_sigla
+                       ,trimestre
+  ), "estoque" = sum(estoque, na.rm = T))
 
 
 

@@ -1,19 +1,21 @@
 library(shiny)
 library(shinydashboard)
 library(shinyWidgets)
+library(reactable)
+options(shiny.reactlog = TRUE, launch.browser = TRUE)
 
 # Para alternar entre tabela e gráfico: radioGroupButtons
 # com tabela e gráfico em tabBox
 
 
 
-# header ----
+# HEADER ----
 
 header <-
   dashboardHeader(title = "Emprego Formal na Mineração", 
                   titleWidth = 350)
 
-# sidebar ----
+# SIDEBAR ----
 
 sidebar <- dashboardSidebar(
   sidebarMenu(
@@ -27,7 +29,7 @@ sidebar <- dashboardSidebar(
     menuItem("Transformação Mineral",
              tabName = "tab_Transformacao")))
 
-# body ----
+# BODY ----
 
 body <-
   dashboardBody(tabItems(
@@ -53,19 +55,49 @@ body <-
         )
       )
     ),
-    
+# TAB_EXTRATIVA ---- 
     tabItem(tabName = "tab_Extrativa"
             ,h2("Extrativa Mineral")
-            
+
+#_Trimestre ----            
             ,fluidRow(
+              column(offset = 0,width = 6
+                     ,sliderTextInput(
+                       inputId = "id.Trimestre.select",
+                       label = "Trimestre",
+                       choices = TRIMESTRES,
+                       selected = TRIMESTRES[c(length(TRIMESTRES)-3,length(TRIMESTRES))]
+                       ))
+#_UFs ----  
+              ,column(offset = 0,width = 6
+                      ,selectInput(
+                        inputId = "id.UF.select",
+                        label = "UF",
+                        choices = list(`Estado` = UF),
+                        multiple = T, selected = UF
+                      )
+              ),
+              
+              actionButton(inputId = "id.Atualizar.button", label = "Ok")
+            ),
+              
+#_tabBox_Extrativa ----            
+            # ,fluidRow(
               tabBox(
                 id = "tabBox_Extrativa",
-                height = "250px",
-                tabPanel("Tab1", "First tab content"),
-                tabPanel("Tab2", "Tab content 2")
-              )
-            )),
-    
+                height = "100%",width = '100%',
+                tabPanel("Tab1", "CNAE 2.0 Divisão"
+                         
+                         ,fluidRow(
+                           column(width = 4
+                         ,plotOutput('id.Graf.Trimestre'))
+                          ,column(width = 4
+                         ,plotOutput("id.Graf.Divisao"))
+                         )),
+                tabPanel("Tab2",reactableOutput("id.Tb.Divisao")))
+              # )
+              ),
+# TAB_Transformacao ----
     tabItem(tabName = "tab_Transformacao"
             ,h2("Transformação Mineral")
     ,fluidRow(
